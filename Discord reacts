@@ -1,6 +1,13 @@
 import discord
 from discord.ext import commands
 import asyncio
+import random
+import os
+
+fact_list = ["Plastik jest obecny w naszym życiu niemal na każdym kroku. Trudno byłoby nam zrezygnować z niego całkowicie, ale dla własnego (i pokolenia naszych dzieci!) dobra musimy znacząco ograniczyć korzystanie z tego nieekologicznego tworzywa.",
+             'Większość z nas nie wyobraża sobie dnia bez kawy. Aromatyczny napój pijamy już nie tylko w  domach czy kawiarniach, ale także w trakcie przemieszczania się z miejsca na miejsce. Dostępność kawy na wynos jest coraz większa - a wraz z nią zużycie jednorazowych kubków i  plastikowych pokrywek. Jeśli często zdarza Ci się kupować kawę to go, zainwestuj w termiczny kubek wielokrotnego użytku.',
+             'Nie bierz słomek - napój bez nich smakuje tak samo dobrze. Słomek używamy zaledwie przez kilka minut, a żeby uległy rozkładowi, musi minąć aż 200 lat. To aż dwa wieki zagrożenia, na które skazujemy środowisko, zwierzęta i siebie samych.']
+
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -19,8 +26,21 @@ async def hello(ctx):
 async def heh(ctx, count_heh = 5):
     await ctx.send("he" * count_heh)
 
+#Odczytywanie zdjęć
+@bot.command()
+async def meme (ctx):
+    with open('zdjęcia/kod_mem1.jpg','rb')as f:
+        mem = discord.File(f)
+    await ctx.send('hello', file=mem)
+
+@bot.command()
+async def environment(ctx):
+    choice = random.choice(fact_list)
+    await ctx.send(choice)
+#reakcję 
 @bot.event
 async def on_message(message):
+    await bot.process_commands(message)
     if message.content.startswith('$done'):
         channel = message.channel
         await channel.send('Czy to wszystko?')
@@ -34,5 +54,15 @@ async def on_message(message):
             await channel.send('👎')
         else:
             await channel.send('👍')
-
+    if message.content.startswith('$meme'):
+        plik = random.choice(os.listdir('zdjęcia'))
+        with open(f'zdjęcia/{plik}','rb')as f:
+            mem = discord.File(f)
+        await message.channel.send('hello', file=mem)
+    if message.content.startswith('$meme/bazinga'):
+        plik = random.choice(os.listdir('bazinga.mem'))
+        with open('bazinga.mem/{plik}','rb')as f:
+            mem = discord.File(f)
+        await message.channel.send('hello', file=mem)
+        
 bot.run("*")
